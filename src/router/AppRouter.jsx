@@ -4,6 +4,8 @@ import { AuthRoutes } from '../Auth';
 import { CalendarRoutes } from '../calendar'
 import { ChildAuthRoutes } from './ChildAuthRoutes';
 import { ChildCalendarRoutes } from './ChildCalendarRoutes';
+import { useAuthStore } from '../hooks/useAuthStore';
+import { useEffect } from 'react';
 
 const routesConfig = createBrowserRouter([
     {
@@ -34,14 +36,23 @@ const routesConfigWithoutAuth= createBrowserRouter([
 
 export const AppRouter = () => {
     
-    const status  = 'not-authenticated';
+    const { status, checkAuthToken } = useAuthStore();
 
-    return <RouterProvider router={routesConfig} />;
+    useEffect(() => {
+        checkAuthToken();
+    }, [])
+    
 
-    // if( status === 'not-authenticated') {
-    //     return <RouterProvider router={routesConfig} />;
-    // } else {
-    //     return <RouterProvider router={routesConfigWithoutAuth} />;
-    // }
+    if( status === 'checking') {
+        return(
+            <h3>Cargando...</h3>
+        )
+    }
+
+    if( status === 'not-authenticated') {
+        return <RouterProvider router={routesConfig} />;
+    } else {
+        return <RouterProvider router={routesConfigWithoutAuth} />;
+    }
 
 }
